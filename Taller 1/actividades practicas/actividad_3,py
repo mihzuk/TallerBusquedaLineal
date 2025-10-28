@@ -1,0 +1,99 @@
+"""
+ACTIVIDAD 3: OPTIMIZACIONES DE BÚSQUEDA LINEAL
+
+"""
+
+import random
+import time
+
+
+
+# Funciones de búsqueda optimizadas
+
+
+def busqueda_lineal_primera_ocurrencia(lista, elemento):
+    """Retorna solo la primera ocurrencia (early exit)."""
+    comparaciones = 0
+    for i, valor in enumerate(lista):
+        comparaciones += 1
+        if valor == elemento:
+            return i, comparaciones
+    return -1, comparaciones
+
+
+def busqueda_lineal_todas_ocurrencias(lista, elemento):
+    """Retorna todas las ocurrencias del elemento."""
+    comparaciones = 0
+    indices = []
+    for i, valor in enumerate(lista):
+        comparaciones += 1
+        if valor == elemento:
+            indices.append(i)
+    return indices, comparaciones
+
+
+def busqueda_lineal_sentinel(lista, elemento):
+    """Búsqueda lineal con elemento centinela."""
+    lista_original = lista.copy()
+    lista.append(elemento)
+    i = 0
+    comparaciones = 0
+
+    while lista[i] != elemento:
+        comparaciones += 1
+        i += 1
+
+    lista.pop()  # Restaurar lista original
+
+    if i < len(lista_original):
+        return i, comparaciones
+    else:
+        return -1, comparaciones
+
+
+
+# Función auxiliar: medir rendimiento
+
+def medir_rendimiento(funcion, lista, elemento):
+    """Mide tiempo de ejecución y comparaciones."""
+    inicio = time.time()
+    resultado, comparaciones = funcion(lista, elemento)
+    fin = time.time()
+    return {
+        "resultado": resultado,
+        "comparaciones": comparaciones,
+        "tiempo": fin - inicio
+    }
+
+
+
+# Comparación práctica de las tres versiones
+
+# Generamos una lista aleatoria con valores repetidos
+lista = [random.randint(1, 100) for _ in range(5000)]
+elemento_existente = random.choice(lista)
+elemento_inexistente = 9999
+
+print("\n===== COMPARACIÓN DE OPTIMIZACIONES DE BÚSQUEDA LINEAL =====\n")
+print(f"{'Versión':<35}{'Elemento':<12}{'Comparaciones':<15}{'Tiempo (s)':<12}Resultado")
+print("-" * 85)
+
+# 1️⃣ Búsqueda con early exit (elemento existente)
+r1 = medir_rendimiento(busqueda_lineal_primera_ocurrencia, lista, elemento_existente)
+print(f"{'Primera ocurrencia (existe)':<35}{elemento_existente:<12}{r1['comparaciones']:<15}{r1['tiempo']:<12.6f}{r1['resultado']}")
+
+# 2️⃣ Búsqueda con early exit (elemento no existe)
+r2 = medir_rendimiento(busqueda_lineal_primera_ocurrencia, lista, elemento_inexistente)
+print(f"{'Primera ocurrencia (no existe)':<35}{elemento_inexistente:<12}{r2['comparaciones']:<15}{r2['tiempo']:<12.6f}{r2['resultado']}")
+
+# 3️⃣ Búsqueda de todas las ocurrencias
+r3 = medir_rendimiento(busqueda_lineal_todas_ocurrencias, lista, elemento_existente)
+print(f"{'Todas las ocurrencias':<35}{elemento_existente:<12}{r3['comparaciones']:<15}{r3['tiempo']:<12.6f}{len(r3['resultado'])} índice(s)")
+
+# 4️⃣ Búsqueda con centinela (elemento existente)
+r4 = medir_rendimiento(busqueda_lineal_sentinel, lista, elemento_existente)
+print(f"{'Búsqueda con centinela (existe)':<35}{elemento_existente:<12}{r4['comparaciones']:<15}{r4['tiempo']:<12.6f}{r4['resultado']}")
+
+# 5️⃣ Búsqueda con centinela (elemento no existe)
+r5 = medir_rendimiento(busqueda_lineal_sentinel, lista, elemento_inexistente)
+print(f"{'Búsqueda con centinela (no existe)':<35}{elemento_inexistente:<12}{r5['comparaciones']:<15}{r5['tiempo']:<12.6f}{r5['resultado']}")
